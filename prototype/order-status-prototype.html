@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Status — Prototype</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --border: #e3e3e3;
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --amber-bg: #fff8e6;
+    --amber-border: #f0c96b;
+    --amber-ink: #7a5b00;
+    --green: #1f7a3e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+  }
+  .toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .toggle button {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .toggle button.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .card {
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    background: var(--bg);
+  }
+  .card h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+  }
+  .card .order-id {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .banner {
+    display: none;
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    color: var(--amber-ink);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .banner strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .state-delayed .banner { display: block; }
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 24px 0;
+  }
+  .steps::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    right: 9px;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    flex: 1;
+  }
+  .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--border);
+    margin: 0 auto 6px;
+  }
+  .step.done .dot { background: var(--green); }
+  .step.current .dot { background: var(--ink); }
+  .step-label { font-size: 11px; color: var(--muted); }
+  .estimate-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+  }
+  .estimate-row .value { font-weight: 600; }
+  .estimate-row .strike { text-decoration: line-through; color: var(--muted); font-weight: 400; margin-right: 6px; }
+  .note {
+    max-width: 480px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+  <div class="toggle">
+    <button id="btn-normal" class="active" onclick="setState('normal')">Normal delivery</button>
+    <button id="btn-delayed" onclick="setState('delayed')">Delayed (proactive notice)</button>
+  </div>
+
+  <div class="card" id="card">
+    <h2>Your order is on the way</h2>
+    <div class="order-id">Order #OL-88213 · placed Aug 12, 2026</div>
+
+    <div class="banner">
+      <strong>Heads up — this order is running late.</strong>
+      We haven't seen a scan update in a while, so it looks like your package is behind schedule. We've updated your estimate below. No action needed on your end — we're tracking it and will update you again if anything changes.
+    </div>
+
+    <div class="steps">
+      <div class="step done"><div class="dot"></div><div class="step-label">Placed</div></div>
+      <div class="step done"><div class="dot"></div><div class="step-label">Packed</div></div>
+      <div class="step current"><div class="dot"></div><div class="step-label">In transit</div></div>
+      <div class="step"><div class="dot"></div><div class="step-label">Delivered</div></div>
+    </div>
+
+    <div class="estimate-row">
+      <span>Original estimate</span>
+      <span class="value" id="original-estimate">Aug 19, 2026</span>
+    </div>
+    <div class="estimate-row" id="revised-row" style="display:none;">
+      <span>Revised estimate</span>
+      <span class="value"><span class="strike" id="strike-date">Aug 19</span>Aug 21–22, 2026</span>
+    </div>
+  </div>
+
+  <p class="note">
+    Prototype only — illustrative dates and copy. Revised-estimate accuracy gets checked against real data from <code>sql/03_olist_delivery_performance.sql</code> before this ships. See <code>prd/proactive-delivery-notifications-prd.md</code> for full scope.
+  </p>
+
+<script>
+  function setState(state) {
+    const card = document.getElementById('card');
+    const revisedRow = document.getElementById('revised-row');
+    const btnNormal = document.getElementById('btn-normal');
+    const btnDelayed = document.getElementById('btn-delayed');
+
+    if (state === 'delayed') {
+      card.className = 'card state-delayed';
+      revisedRow.style.display = 'flex';
+      btnDelayed.classList.add('active');
+      btnNormal.classList.remove('active');
+    } else {
+      card.className = 'card';
+      revisedRow.style.display = 'none';
+      btnNormal.classList.add('active');
+      btnDelayed.classList.remove('active');
+    }
+  }
+</script>
+
+</body>
+</html>

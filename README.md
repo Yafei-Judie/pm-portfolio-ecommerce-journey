@@ -18,12 +18,18 @@ See `SETUP.md` for exactly how to get both connected (both need a free account â
 | Folder | What's in it |
 |---|---|
 | `sql/` | Funnel, channel-performance, delivery-performance, and delay-vs-review-score queries |
-| `analysis/` | Findings and charts once the queries are run against live data |
+| `analysis/` | `findings.md` (real numbers + charts) and `make_charts.py`, which regenerates every chart from the query output |
 | `prd/` | A full PRD for a feature the data justifies |
 | `roadmap/` | RICE-prioritized roadmap and release timeline for that feature |
 | `prototype/` | A small AI-assisted clickable prototype of the feature |
 | `qa/` | Test plan and defect log for the prototype |
-| `docs/` | Project charter and working docs (stand-in for Confluence) |
+| `docs/` | Project charter, an Amplitude event-taxonomy spec for the feature, and working docs (stand-in for Confluence) |
+
+## Findings, in one chart
+
+![Delivery timing vs average review score](analysis/charts/olist_delay_vs_review.png)
+
+A delivery that lands 7+ days late drops the average review score from ~4.3 to 1.70, and pushes the share of 1-2 star reviews from ~9% to 79%. Being early costs almost nothing. Full findings, funnel/channel charts, and the SQL behind all of it are in `analysis/findings.md`.
 
 ## The narrative this builds toward
 
@@ -31,4 +37,4 @@ The data (particularly Olist's estimated-vs-actual delivery gap) points at a spe
 
 ## Status
 
-Scaffold and query set are complete. Charts and findings in `analysis/` populate once the datasets are connected (see `SETUP.md`) â€” no fabricated numbers here.
+All four queries run, findings written up with charts, PRD and roadmap rewritten against the real numbers. What's still open: the QA test plan's defect log is a template with no executed defects yet (honest gap, not hidden), and the Amplitude taxonomy in `docs/` is a specification, not a live instance, since this feature hasn't shipped anywhere real. No fabricated numbers anywhere in this repo.

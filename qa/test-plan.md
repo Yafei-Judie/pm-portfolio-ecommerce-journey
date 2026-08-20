@@ -19,7 +19,15 @@ Covers the trigger logic, email send, and the revised-estimate content. Does not
 
 ## Defect log
 
-Empty until v1 build starts — this is where real defects get tracked, prioritized (P0/P1/P2), and marked resolved as the prototype in `prototype/` gets tested against these cases. Kept empty here deliberately rather than filled with invented bugs.
+Most of the test cases above (TC-01 through TC-05, TC-08) test backend trigger logic that doesn't exist yet — there's no live system behind the two HTML prototypes, so those cases stay untested until v1 actually builds. What *can* be tested now is the prototype UI itself, so I did:
+
+| ID | Found | Severity | Status |
+|---|---|---|---|
+| DEF-01 | The order-status prototype's revised-estimate date (originally "Aug 21–22") and the email prototype's matching date were both arbitrary placeholders, not tied to any real number, despite the repo's own rule that nothing states a figure without a source. | P2 | **Fixed** — both now show a delay window (~11 days past the original estimate) matching the real average delay among late orders from `sql/04_olist_delay_vs_reviews.sql` (10.6 days, n=6,534). Verified by re-rendering both prototypes locally and confirming the new date and footnote text. |
+
+TC-07 (notification content renders correctly, no leftover placeholder text) passes for both prototypes as of this fix — verified via a local HTTP server (`python3 -m http.server`, since `file://` URLs don't work with the browser automation used here) and a visual check of both the normal and delayed states.
+
+Real defect count so far: 1 found, 1 fixed. This log grows as v1 actually gets built and tested against the trigger-logic cases above.
 
 ## Sign-off criteria for v1 ship
 

@@ -4,6 +4,8 @@
 
 Run against `bigquery-public-data.ga4_obfuscated_sample_ecommerce` (Google Merchandise Store, Nov 2020–Jan 2021) in BigQuery sandbox mode, 179 MB processed.
 
+![GA4 acquisition funnel by month](charts/ga4_funnel.png)
+
 | Month | Viewed item | Added to cart | Began checkout | Purchased | View→Cart | Cart→Checkout | Checkout→Purchase | Overall conversion |
 |---|---|---|---|---|---|---|---|---|
 | 2020-11 | 21,440 | 2,060 | 4,219 | 1,532 | 9.6% | 204.8% | 36.3% | 7.1% |
@@ -15,6 +17,8 @@ Run against `bigquery-public-data.ga4_obfuscated_sample_ecommerce` (Google Merch
 **Data quality note, stated plainly rather than smoothed over:** November's cart→checkout rate is 204.8% — more checkouts than cart-adds in the same month. That's a real artifact of this dataset, not a calculation error: Google's own docs for `ga4_obfuscated_sample_ecommerce` warn the obfuscation process limits internal consistency (some fields carry `<Other>` or null placeholders, and event-to-event linkage isn't guaranteed clean). Read November's checkout/purchase figures with that caveat; December and January are more internally consistent.
 
 ## GA4 channel performance (`sql/02_ga4_channel_performance.sql`)
+
+![GA4 revenue by acquisition channel](charts/ga4_channel_revenue.png)
 
 Same dataset, all three months combined, 223 MB processed. Metric is `users_started_session` (distinct users triggering `session_start`) rather than a true session count — the dataset's `ga_session_id` event param wasn't reliably populated for `session_start` events, so an exact session-level join returned zero rows. Distinct users is the more robust and still-honest version of "reach."
 
@@ -35,6 +39,8 @@ Same dataset, all three months combined, 223 MB processed. Metric is `users_star
 ## Olist delivery performance by state (`sql/03_olist_delivery_performance.sql`)
 
 Run against the Olist Brazilian E-Commerce dataset (Kaggle, ~100k orders, 2016–2018) loaded into local SQLite. 27 states with 30+ delivered orders, out of 96,353 delivered orders total.
+
+![Delivery lateness by state](charts/olist_late_by_state.png)
 
 | State | Delivered orders | Avg days late | % late | % on-time or early |
 |---|---|---|---|---|
@@ -71,6 +77,8 @@ State names are Brazilian postal abbreviations (SP = São Paulo, RJ = Rio de Jan
 ## Olist delay vs. review score (`sql/04_olist_delay_vs_reviews.sql`)
 
 Same dataset, delivered orders joined to their review score, bucketed by how early/late delivery landed against the estimate.
+
+![Delivery timing vs average review score](charts/olist_delay_vs_review.png)
 
 | Delivery timing | Orders | Avg review score | % 1-2 star |
 |---|---|---|---|

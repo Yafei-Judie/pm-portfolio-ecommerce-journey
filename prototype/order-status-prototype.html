@@ -152,12 +152,12 @@
     </div>
     <div class="estimate-row" id="revised-row" style="display:none;">
       <span>Revised estimate</span>
-      <span class="value"><span class="strike" id="strike-date">Aug 19</span>Aug 21–22, 2026</span>
+      <span class="value"><span class="strike" id="strike-date">Aug 19</span>Aug 29–30, 2026</span>
     </div>
   </div>
 
   <p class="note">
-    Prototype only — illustrative dates and copy. Revised-estimate accuracy gets checked against real data from <code>sql/03_olist_delivery_performance.sql</code> before this ships. See <code>prd/proactive-delivery-notifications-prd.md</code> for full scope.
+    Prototype only — order number and dates are illustrative, but the revised-estimate gap (about 11 days past the original) is not arbitrary: it matches the real average delay among late orders in <code>sql/04_olist_delay_vs_reviews.sql</code>'s output (10.6 days, n=6,534). See <code>prd/proactive-delivery-notifications-prd.md</code> for full scope.
   </p>
 
 <script>

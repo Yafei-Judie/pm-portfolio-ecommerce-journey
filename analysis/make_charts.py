@@ -28,7 +28,7 @@ plt.rcParams["xtick.color"] = INK_MUTED
 plt.rcParams["ytick.color"] = INK_MUTED
 
 # Numbers below are copy-pasted from analysis/findings.md, which is itself sourced
-# from real query output (sql/01-04). Re-run the queries first if you want to
+# from real query output (sql/01-07). Re-run the queries first if you want to
 # regenerate findings.md and this script from scratch instead of trusting these
 # hardcoded values.
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "charts")
@@ -135,6 +135,67 @@ for bar, v in zip(bars, scores):
     ax.text(bar.get_x() + bar.get_width() / 2, v + 0.08, f"{v:.2f}", ha="center", fontsize=10, color=INK_PRIMARY, fontweight="bold")
 fig.tight_layout()
 fig.savefig(f"{OUT}/olist_delay_vs_review.png", facecolor=SURFACE)
+plt.close(fig)
+
+# 5. Distance vs lateness: does physical distance explain delay better than state alone?
+fig, ax = plt.subplots(figsize=(9, 5), dpi=150)
+fig.patch.set_facecolor(SURFACE)
+buckets = ["Under 50km\n(same metro)", "50-300km", "300-800km", "800-1500km", "1500km+"]
+pct_late_by_dist = [4.4, 5.0, 7.0, 7.5, 11.7]
+bars = ax.bar(buckets, pct_late_by_dist, color=ORDINAL_BLUE + [ "#1c5cab"], width=0.6)
+ax.set_ylabel("% of delivered orders that arrived late")
+ax.set_title("Delivery lateness vs. seller-customer distance", color=INK_PRIMARY, fontsize=13, loc="left", pad=14)
+ax.yaxis.grid(True, color=GRIDLINE, linewidth=1)
+ax.set_axisbelow(True)
+style_ax(ax)
+for bar, v in zip(bars, pct_late_by_dist):
+    ax.text(bar.get_x() + bar.get_width() / 2, v + 0.25, f"{v}%", ha="center", fontsize=10, color=INK_PRIMARY, fontweight="bold")
+ax.set_ylim(0, 13)
+fig.tight_layout()
+fig.savefig(f"{OUT}/olist_distance_vs_delay.png", facecolor=SURFACE)
+plt.close(fig)
+
+# 6. Repeat purchase rate by first-order delivery experience
+fig, ax = plt.subplots(figsize=(7, 5), dpi=150)
+fig.patch.set_facecolor(SURFACE)
+groups = ["First order\non-time/early", "First order\nwas late"]
+pct_repeat = [3.03, 2.55]
+ns = [86993, 6357]
+colors = [CAT_BLUE, DIVERGING_RED[0]]
+bars = ax.bar(groups, pct_repeat, color=colors, width=0.5)
+ax.set_ylabel("% who became a repeat customer")
+ax.set_title("Repeat-purchase rate by first-order delivery experience", color=INK_PRIMARY, fontsize=13, loc="left", pad=14)
+ax.yaxis.grid(True, color=GRIDLINE, linewidth=1)
+ax.set_axisbelow(True)
+style_ax(ax)
+for bar, v, n in zip(bars, pct_repeat, ns):
+    ax.text(bar.get_x() + bar.get_width() / 2, v + 0.05, f"{v}%", ha="center", fontsize=11, color=INK_PRIMARY, fontweight="bold")
+    ax.text(bar.get_x() + bar.get_width() / 2, v / 2, f"n={n:,}", ha="center", fontsize=8, color="#ffffff")
+ax.set_ylim(0, 3.6)
+fig.tight_layout()
+fig.savefig(f"{OUT}/olist_repeat_purchase.png", facecolor=SURFACE)
+plt.close(fig)
+
+# 7. Freight cost as % of price by category
+fig, ax = plt.subplots(figsize=(9, 6), dpi=150)
+fig.patch.set_facecolor(SURFACE)
+categories = ["food_drink", "electronics", "furniture_living_room", "kitchen_dining_laundry_garden_furniture",
+              "drinks", "office_furniture", "food", "furniture_decor", "housewares", "books_technical",
+              "telephony", "luggage_accessories", "fashion_shoes", "costruction_tools_garden", "fashion_bags_accessories"]
+freight_pct = [29.7, 29.1, 26.1, 25.9, 25.6, 25.0, 24.7, 23.7, 23.1, 22.4, 22.0, 21.7, 20.9, 20.7, 20.6]
+pairs = sorted(zip(categories, freight_pct), key=lambda p: p[1])
+cats_sorted = [p[0] for p in pairs]
+pct_sorted = [p[1] for p in pairs]
+ax.barh(cats_sorted, pct_sorted, color=CAT_BLUE, height=0.65)
+ax.set_xlabel("Freight cost as % of item price")
+ax.set_title("Freight economics: highest freight-to-price categories (200+ items)", color=INK_PRIMARY, fontsize=13, loc="left", pad=14)
+ax.xaxis.grid(True, color=GRIDLINE, linewidth=1)
+ax.set_axisbelow(True)
+style_ax(ax, hide_spines=("top", "right"))
+for i, v in enumerate(pct_sorted):
+    ax.text(v + 0.3, i, f"{v}%", va="center", fontsize=9, color=INK_SECONDARY)
+fig.tight_layout()
+fig.savefig(f"{OUT}/olist_freight_economics.png", facecolor=SURFACE)
 plt.close(fig)
 
 print("done")

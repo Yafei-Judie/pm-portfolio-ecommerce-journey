@@ -91,3 +91,60 @@ Same dataset, delivered orders joined to their review score, bucketed by how ear
 **Read:** this is the number the whole PRD leans on, and it's a strong, clean signal — not a marginal one. A delivery that's 7+ days late drops the average review from ~4.3 (typical for early/on-time) to 1.7, and the share of 1-2 star reviews jumps from ~9% to 79%. Even a modest 1-7 day delay roughly halves the average score and pushes nearly half of reviews into the 1-2 star range. Being early costs almost nothing — early (8+ days) and early (1-7 days) score almost identically to on-time. The finding isn't "faster is better," it's specifically "late is very costly, and the cost curve is steep, not gradual."
 
 Combined 6,409 orders (2,797 + 3,612) across the full 2016–2018 dataset were late — roughly 6.7% of the 96,353 delivered-and-reviewed orders. That's the reach figure `roadmap/roadmap.md`'s RICE score is built on.
+
+**Important caveat, found by pressure-testing this finding rather than just reporting it:** see `analysis/limitations-and-alternative-views.md` for a full independent critique of this section — it isn't proven causation (no seller/category/distance control), and the 1-2 star share is a more defensible number than the mean-score gap. The single sharpest finding from that pass gets its own section below because it changes how this whole table should be read.
+
+## Review timing vs. delivery (`sql/08_review_timing_vs_delivery.sql`)
+
+Same dataset. This checks something the table above doesn't show: whether customers review *after* they've actually received the package, or before.
+
+![Delivery timing vs average review score](charts/olist_delay_vs_review.png)
+
+| Delivery bucket | Orders | Review answered before actual delivery |
+|---|---|---|
+| 7+ days late | 2,797 | 97.3% |
+| 1-7 days late | 3,612 | 49.2% |
+| On the estimated day | 2,748 | 1.0% |
+| Early (1-7 days) | 20,680 | 0.4% |
+| Early (8+ days) | 66,516 | 0.3% |
+
+**Read:** for the bucket the whole PRD is built on, 97.3% of reviews were submitted *before the package arrived*. This isn't an edge case, it's nearly the entire bucket. Olist's review survey triggers off the estimated delivery date, not actual receipt, so once an order is running badly behind schedule, most customers rate it while still waiting. This means the 1.70 average score for the "7+ days late" bucket mostly isn't measuring "I received it late and was upset" — it's measuring "it's overdue and I'm still waiting." That doesn't weaken the case for a notification feature; it arguably strengthens a different version of it (the pain is the open-ended silent wait, exactly what a proactive message addresses), but it means comparing review score against final delivery date is the wrong way to measure whether a notification helped — see `prd/proactive-delivery-notifications-prd.md` section 5 for the corrected metric.
+
+Two smaller data-quality notes from the same check: 646 of 96,470 delivered orders (0.67%) have no matching review and get silently dropped by the inner join in `sql/04`; 547 orders have duplicate review rows, which slightly over-counts whichever bucket they land in. Neither changes the headline numbers meaningfully.
+
+## Seller-customer distance vs. delay (`sql/05_distance_vs_delay.sql`)
+
+Real haversine distance (km) between seller and customer, computed from averaged zip-code-prefix lat/lng in the geolocation table, bucketed against on-time performance. 95,992 of 96,353 delivered orders matched to a computable distance (some zip prefixes have no geolocation rows).
+
+![Delivery lateness vs seller-customer distance](charts/olist_distance_vs_delay.png)
+
+| Distance | Orders | Avg distance in bucket | % late |
+|---|---|---|---|
+| Under 50km (same metro) | 11,751 | ~22km | 4.4% |
+| 50-300km | 19,489 | ~161km | 5.0% |
+| 300-800km | 40,812 | ~492km | 7.0% |
+| 800-1500km | 15,172 | ~1,033km | 7.5% |
+| 1500km+ | 8,768 | ~2,116km | 11.7% |
+
+**Read:** this is a real mechanism behind the state-level lateness pattern in `sql/03`, not just a coincidence of which state a customer lives in. Same-metro deliveries run late 4.4% of the time; deliveries over 1,500km apart run late nearly 3x as often (11.7%). Physical distance is a genuine driver, which matters for the PRD: a notification should trigger off real per-order signals, not assume delay risk is uniform.
+
+## Repeat purchase by first-order delivery experience (`sql/06_repeat_purchase_by_delay.sql`)
+
+Uses `customer_unique_id`, which persists across orders for the same real person (unlike `customer_id`, which this dataset assigns fresh per order).
+
+![Repeat-purchase rate by first-order delivery experience](charts/olist_repeat_purchase.png)
+
+| First order was... | Customers | Became repeat | % became repeat |
+|---|---|---|---|
+| On-time/early | 86,993 | 2,639 | 3.03% |
+| Late | 6,357 | 162 | 2.55% |
+
+**Read:** real effect, same direction as the review-score story, but much smaller in relative terms — about a 16% relative reduction, not the ~60% collapse the review-score mean suggests. Worth reading alongside the baseline: only ~3% of *all* customers repeat-purchase here regardless of delivery timing, since Olist is a fragmented marketplace of many independent sellers rather than a single retailer relationship. This is a review-experience problem with a real but modest revenue echo, not a proven large retention play — see `prd/proactive-delivery-notifications-prd.md` section 2 for how this tempers the feature's business case.
+
+## Freight economics by category (`sql/07_freight_economics.sql`)
+
+Not about delivery timing directly, but relevant business context for the same PRD: categories where freight already eats a large share of price have less room for any fix that adds shipping cost.
+
+![Freight cost as % of price by category](charts/olist_freight_economics.png)
+
+**Read:** freight runs 20-30% of item price across food/drink, electronics, and multiple furniture categories — high enough that a fix requiring faster (pricier) shipping would face a much tighter margin ceiling than one that doesn't, like a notification. This is one reason a communication-only fix is the right v1 scope, not a shipping-speed upgrade.

@@ -1,24 +1,21 @@
 -- On-time delivery rate: does the actual delivery date beat the estimated delivery date?
--- Dataset: Olist Brazilian E-Commerce (loaded via SETUP.md into DuckDB/SQLite)
+-- Dataset: Olist Brazilian E-Commerce (loaded via SETUP.md into SQLite)
 -- Question this answers: what % of orders miss their promised delivery window, and does
 -- that vary by customer state (proxy for carrier/region performance)?
+--
+-- SQLite has no DATE_DIFF or DATE type — dates are stored as ISO8601 text, so day
+-- differences use julianday() subtraction instead.
 
 WITH delivered_orders AS (
   SELECT
     o.order_id,
     c.customer_state,
-    o.order_purchase_timestamp,
-    o.order_estimated_delivery_date,
-    o.order_delivered_customer_date,
-    DATE_DIFF(
-      CAST(o.order_delivered_customer_date AS DATE),
-      CAST(o.order_estimated_delivery_date AS DATE),
-      DAY
-    ) AS days_late  -- positive = late, negative = early, 0 = on the day
+    CAST(julianday(o.order_delivered_customer_date) - julianday(o.order_estimated_delivery_date) AS INTEGER) AS days_late
+    -- positive = late, negative = early, 0 = on the day
   FROM orders o
   JOIN customers c ON c.customer_id = o.customer_id
   WHERE o.order_status = 'delivered'
-    AND o.order_delivered_customer_date IS NOT NULL
+    AND o.order_delivered_customer_date IS NOT NULL AND o.order_delivered_customer_date != ''
 )
 
 SELECT

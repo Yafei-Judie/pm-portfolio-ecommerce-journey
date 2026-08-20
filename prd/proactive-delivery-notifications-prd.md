@@ -1,18 +1,24 @@
 # PRD: Proactive Delivery Delay Notifications
 
 **Owner:** Judie (Associate PM case study)
-**Status:** Draft — pending real data from `sql/03` and `sql/04`
-**Last updated:** placeholder, fill in once query results are in
+**Status:** Problem validated against real data (Olist Brazilian E-Commerce dataset, ~100k orders, 2016–2018)
+**Last updated:** 2026-08-19, after running `sql/03` and `sql/04`
 
 ## 1. Problem
 
-Customers currently find out a delivery is going to miss its promised window only when it's already late — no delivery, no email, no proactive signal. The `04_olist_delay_vs_reviews.sql` analysis is built to test the hypothesis that late deliveries drive a disproportionate share of low review scores, and `03_olist_delivery_performance.sql` is built to show whether lateness is a systemic issue or concentrated in a few regions/carriers.
+Customers currently find out a delivery is going to miss its promised window only when it's already late — no proactive signal beforehand. This isn't a hunch; it's confirmed by `sql/04_olist_delay_vs_reviews.sql` against real order and review data:
 
-*(Once the real numbers come back from BigQuery/DuckDB, this section gets rewritten with the actual pct_late, avg_days_late, and review-score delta — no estimate stands in for a real query result.)*
+- A delivery that lands **7+ days late** drops the average review score from ~4.3 (typical for on-time/early) to **1.70**, and pushes the share of 1-2 star reviews from ~9% to **79.2%**.
+- Even a modest **1-7 day** delay roughly halves the average score (2.71) and pushes **49.4%** of reviews into 1-2 stars.
+- Being early costs almost nothing — early-by-8+-days and early-by-1-7-days score nearly identically to on-time delivery.
+
+And `sql/03_olist_delivery_performance.sql` shows this isn't evenly distributed: lateness ranges from 2.8% of deliveries (Amazonas) to 21.4% (Alagoas) by state, with the highest-volume state (São Paulo, 42% of all delivered orders) sitting at a relatively good 4.5% late. This is a distance/logistics-coverage problem concentrated in specific regions, not a flat national delay rate — which matters directly for scope: a notification should trigger off the actual per-order delay signal, not an assumed average.
+
+Across the full dataset, 6,409 of 96,353 delivered-and-reviewed orders (6.7%) were late. That reach number is what `roadmap/roadmap.md`'s RICE score is built on.
 
 ## 2. Goal
 
-Reduce the share of 1-2 star reviews attributable to delivery timing by giving customers an honest, early heads-up when a delay is detected, instead of silence followed by a late package.
+Reduce the share of 1-2 star reviews attributable to delivery timing by giving customers an honest, early heads-up when a delay is detected, instead of silence followed by a late package. Given the data above, even converting a fraction of the "7+ days late" bucket's reviews from the 1.70 average toward something closer to the "1-7 days late" bucket's 2.71 would be a meaningful move on overall review health, since that bucket alone drives a disproportionate share of 1-2 star reviews.
 
 ## 3. Non-goals
 
@@ -43,6 +49,6 @@ When an order's delivery status feed shows it's likely to miss the estimated del
 - What delay signal is actually available from the carrier feed at trigger time? (Depends on real fulfillment infra — flagged as a build-team question, not assumed.)
 - Where's the threshold for "flag to CX for proactive compensation"? Needs a real cost-per-discount vs. review-score-value tradeoff, not a guess.
 
-## 8. What the data needs to show before this ships
+## 8. Validation outcome
 
-This PRD is written before the queries are run, deliberately — the whole point of the exercise is that `sql/04` either confirms or kills the premise. If delayed orders don't actually score meaningfully lower, this PRD gets rewritten around whatever problem the data does show.
+This PRD was originally scoped before the queries were run, deliberately — the point was to let `sql/04` confirm or kill the premise rather than write the problem statement first and go looking for numbers to back it. It confirmed the premise cleanly: late delivery has a steep, specific cost (79.2% of 7+-days-late orders get 1-2 stars, vs. ~9% for on-time/early), not a marginal one. Section 1 above now reflects the real numbers. If a future iteration's data doesn't support a change like this, the right move is the same one this PRD modeled: rewrite the problem around what the data actually shows, not what the roadmap already committed to.

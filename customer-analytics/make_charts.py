@@ -194,7 +194,7 @@ quad_colors = {
     "Save first (high risk, high value)": DIVERGING_RED[0],
     "Protect, low effort (low risk, high value)": ORDINAL_BLUE[3],
     "Low priority (high risk, low value)": DIVERGING_GRAY,
-    "Deprioritize (low risk, low value)": "#d8d5cb",
+    "Deprioritize (low risk, low value)": GRIDLINE,
 }
 fig, ax = plt.subplots(figsize=(9, 7), dpi=150)
 fig.patch.set_facecolor(SURFACE)

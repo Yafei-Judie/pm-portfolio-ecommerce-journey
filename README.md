@@ -8,12 +8,17 @@ A self-directed product management case study covering the full customer journey
 
 Most PM portfolio pieces are either pure case-study writeups (no data, no proof of technical fluency) or pure SQL/dashboard projects (no product thinking). This one does both, and then goes a step further most portfolio pieces skip: it pressure-tests its own headline finding instead of just reporting it. Real queries against real public datasets, an independent critique of the conclusion, and a real product decision built from what survives that critique — documented the way a PM actually documents it.
 
+## Two modules, two different skill sets
+
+`sql/`, `analysis/`, `dashboard/`, `prd/`, `roadmap/`, `prototype/`, and `qa/` are the PM/SQL module described above. `customer-analytics/` is a separate module covering skills that one doesn't touch: exploratory data analysis, RFM customer segmentation, a churn classification model, and probabilistic customer-lifetime-value estimation, in an actually-executed Jupyter notebook rather than SQL and markdown. It runs on a different dataset (UCI Online Retail II, not Olist) on purpose — Olist has thousands of near-duplicate public notebooks doing versions of the same delivery/review analysis, and reusing it for a data-analyst-style deliverable would just be another one of those.
+
 ## Datasets
 
 - **[GA4 sample e-commerce dataset](https://developers.google.com/analytics/bigquery/web-ecommerce-demo-dataset)** (`bigquery-public-data.ga4_obfuscated_sample_ecommerce`) — real BigQuery event export from the Google Merchandise Store, Nov 2020–Jan 2021. Used for the acquisition and on-site funnel analysis. Free to query in BigQuery's 1TB/month free tier.
 - **[Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)** (Kaggle) — ~100k real orders with purchase timestamps, estimated vs. actual delivery dates, customer review scores, freight costs, and seller/customer geolocation. Used for the fulfillment/delivery and post-purchase analysis.
+- **[UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii)** — ~1.07M real invoice line items from a UK-based online gift wholesaler, Dec 2009–Dec 2011. Used for the customer-analytics module (RFM segmentation, churn modeling, CLV estimation).
 
-See `SETUP.md` for exactly how to get both connected (both need a free account — Google Cloud and Kaggle — that I can't create on your behalf).
+See `SETUP.md` for exactly how to get the GA4/Olist datasets connected (both need a free account — Google Cloud and Kaggle — that I can't create on your behalf). Online Retail II downloads directly from UCI, no account needed.
 
 ## Structure
 
@@ -27,6 +32,7 @@ See `SETUP.md` for exactly how to get both connected (both need a free account �
 | `prototype/` | Two AI-built clickable prototypes of the feature (order status page, email notification) |
 | `qa/` | Test plan, a real runnable trigger-logic simulator (`trigger_simulator.py`), and a defect log with one fixed and one open, correctly-scoped defect |
 | `docs/` | Project charter, an Amplitude event-taxonomy spec for the feature, and working docs (stand-in for Confluence) |
+| `customer-analytics/` | `clv_churn_analysis.ipynb` (executed EDA + RFM + churn model + CLV notebook), `findings.md`, `make_charts.py`, real UK online-retail transaction data — the data-analyst/data-science module, separate dataset from the PM/SQL module above |
 
 ## Findings, in one chart
 

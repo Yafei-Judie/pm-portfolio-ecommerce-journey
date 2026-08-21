@@ -3,3 +3,5 @@ analysis/olist-data/
 .DS_Store
 __pycache__/
 *.pyc
+customer-analytics/.venv/
+customer-analytics/data/

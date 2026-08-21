@@ -40,7 +40,7 @@ sqlite3 -header -column analysis/olist-data/olist.db < sql/03_olist_delivery_per
 
 (sql/03 and sql/04 were rewritten from an earlier DuckDB-syntax draft to SQLite syntax — `DATE_DIFF`/`CAST AS DATE` don't exist in SQLite, so date math uses `julianday()` instead. If you'd rather use DuckDB, `brew install duckdb` and adjust the date functions back.)
 
-## 3. UCI Online Retail II (for `customer-analytics/`) — done
+## 3. UCI Online Retail II (for `customer-analytics/`), done
 
 1. Downloaded directly, no account needed:
 
@@ -58,7 +58,7 @@ source .venv/bin/activate
 pip install pandas numpy matplotlib seaborn scikit-learn lifetimes openpyxl jupyter nbformat nbclient ipykernel
 ```
 
-3. `lifetimes` (BG/NBD + Gamma-Gamma for the CLV estimate) installed cleanly on Python 3.14 — no fallback needed.
+3. `lifetimes` (BG/NBD + Gamma-Gamma for the CLV estimate) installed cleanly on Python 3.14, no fallback needed.
 
 4. Ran the notebook for real with a live kernel, not hand-written outputs:
 
@@ -66,7 +66,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn lifetimes openpyxl jupy
 jupyter nbconvert --to notebook --execute --inplace customer-analytics/clv_churn_analysis.ipynb --ExecutePreprocessor.timeout=1200
 ```
 
-The raw xlsx (45.6MB) and the venv are both gitignored — `customer-analytics/data/` and `customer-analytics/.venv/`. Re-run the two commands above to regenerate them; the notebook doesn't depend on anything else being present.
+The raw xlsx (45.6MB) and the venv are both gitignored (`customer-analytics/data/` and `customer-analytics/.venv/`). Re-run the two commands above to regenerate them; the notebook doesn't depend on anything else being present.
 
 ## Data is in
 

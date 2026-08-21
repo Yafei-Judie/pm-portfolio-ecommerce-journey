@@ -12,12 +12,17 @@ GRIDLINE = "#e1e0d9"
 BASELINE = "#c3c2b7"
 SURFACE = "#ffffff"
 
+# Morandi palette — dusty, low-chroma hues, still validated against the
+# dataviz skill's six checks (chroma floor, CVD separation, normal-vision
+# floor, contrast) at every step actually paired on a chart. See
+# analysis/MORANDI_PALETTE.md for the validator output this was checked against.
 # Ordinal blue ramp (funnel stages) light->dark, step 250/350/450/550
-ORDINAL_BLUE = ["#86b6ef", "#5598e7", "#2a78d6", "#1c5cab"]
-CAT_BLUE = "#2a78d6"
-DIVERGING_RED = ["#d03b3b", "#e88f8f"]  # critical-ish red, lighter red
-DIVERGING_GRAY = "#c3c2b7"
-DIVERGING_BLUE = ["#9ec5f4", "#2a78d6"]  # light blue, blue
+ORDINAL_BLUE = ["#70afea", "#5b99d3", "#4583bc", "#2b6aa1"]
+CAT_BLUE = "#4583bc"
+DIVERGING_RED = ["#914337", "#cb7867"]  # dusty brick (extreme), lighter terracotta
+DIVERGING_GRAY = "#c5bcb1"  # warm greige
+DIVERGING_BLUE = ["#70afea", "#4583bc"]  # light dusty blue, dusty blue
+BLUE_DARK = "#12568b"  # step 600, for single-item highlights (SP, 1500km+)
 
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Helvetica", "Arial", "DejaVu Sans"]
@@ -104,7 +109,7 @@ pct_late = [21.4, 17.4, 15.2, 13.9, 13.8, 12.2, 12.2, 12.1, 11.2, 10.7, 10.4, 9.
 pairs = sorted(zip(states, pct_late), key=lambda p: p[1])
 states_sorted = [p[0] for p in pairs]
 pct_sorted = [p[1] for p in pairs]
-colors = [CAT_BLUE if s != "SP" else "#1c5cab" for s in states_sorted]
+colors = [CAT_BLUE if s != "SP" else BLUE_DARK for s in states_sorted]
 ax.barh(states_sorted, pct_sorted, color=colors, height=0.65)
 ax.set_xlabel("% of delivered orders that arrived late")
 ax.set_title("Delivery lateness by state, all 27 states with 30+ orders", color=INK_PRIMARY, fontsize=13, loc="left", pad=14)
@@ -142,7 +147,7 @@ fig, ax = plt.subplots(figsize=(9, 5), dpi=150)
 fig.patch.set_facecolor(SURFACE)
 buckets = ["Under 50km\n(same metro)", "50-300km", "300-800km", "800-1500km", "1500km+"]
 pct_late_by_dist = [4.4, 5.0, 7.0, 7.5, 11.7]
-bars = ax.bar(buckets, pct_late_by_dist, color=ORDINAL_BLUE + [ "#1c5cab"], width=0.6)
+bars = ax.bar(buckets, pct_late_by_dist, color=ORDINAL_BLUE + [BLUE_DARK], width=0.6)
 ax.set_ylabel("% of delivered orders that arrived late")
 ax.set_title("Delivery lateness vs. seller-customer distance", color=INK_PRIMARY, fontsize=13, loc="left", pad=14)
 ax.yaxis.grid(True, color=GRIDLINE, linewidth=1)

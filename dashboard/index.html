@@ -15,13 +15,13 @@
     --ink-muted: #848d9c;
     --border: #dee2e8;
     --border-strong: #c5cbd4;
-    --accent: #2a78d6;
+    --accent: #2b6aa1;
     --accent-ink: #ffffff;
-    --accent-wash: #e7f0fc;
-    --red: #d03b3b;
-    --red-wash: #fbe9e9;
-    --blue-light: #9ec5f4;
-    --gray-mid: #c3c2b7;
+    --accent-wash: #e6f1fb;
+    --red: #914337;
+    --red-wash: #faeae6;
+    --blue-light: #70afea;
+    --gray-mid: #c5bcb1;
     --shadow: 0 1px 2px rgba(18,21,27,0.06), 0 4px 16px rgba(18,21,27,0.06);
     --radius: 10px;
     color-scheme: light;
@@ -36,13 +36,13 @@
       --ink-muted: #6d7686;
       --border: #262c38;
       --border-strong: #333b4a;
-      --accent: #5798e8;
+      --accent: #5b99d3;
       --accent-ink: #0b1220;
-      --accent-wash: #17263b;
-      --red: #e6716f;
-      --red-wash: #331c1d;
-      --blue-light: #3b5b82;
-      --gray-mid: #3a3f47;
+      --accent-wash: #162737;
+      --red: #ca7765;
+      --red-wash: #311e1a;
+      --blue-light: #335d83;
+      --gray-mid: #433e37;
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
       color-scheme: dark;
     }
@@ -56,13 +56,13 @@
     --ink-muted: #6d7686;
     --border: #262c38;
     --border-strong: #333b4a;
-    --accent: #5798e8;
+    --accent: #5b99d3;
     --accent-ink: #0b1220;
-    --accent-wash: #17263b;
-    --red: #e6716f;
-    --red-wash: #331c1d;
-    --blue-light: #3b5b82;
-    --gray-mid: #3a3f47;
+    --accent-wash: #162737;
+    --red: #ca7765;
+    --red-wash: #311e1a;
+    --blue-light: #335d83;
+    --gray-mid: #433e37;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
     color-scheme: dark;
   }
@@ -522,8 +522,11 @@
     });
   }
 
-  const BLUE = "#2a78d6", BLUE_DARK = "#1c5cab", BLUE_MID = "#5598e7", BLUE_LIGHT = "#86b6ef";
-  const RED = "#d03b3b", RED_LIGHT = "#e88f8f", GRAY = "#c3c2b7";
+  // Morandi palette — dusty, low-chroma hues, validated against the dataviz
+  // skill's six checks (chroma floor, CVD separation, normal-vision floor,
+  // contrast) for every pair actually shown together on a chart.
+  const BLUE = "#4583bc", BLUE_DARK = "#12568b", BLUE_MID = "#5b99d3", BLUE_LIGHT = "#70afea";
+  const RED = "#914337", RED_LIGHT = "#cb7867", GRAY = "#c5bcb1";
 
   // 1. Funnel
   verticalBars("chart-funnel", {
